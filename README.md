@@ -81,6 +81,10 @@ Just talk to it:
 - **Keyword search only** — no semantic/meaning-based search. The skill compensates by running multiple queries from different angles.
 - **No `min_likes` filter** — engagement filtering happens after results come back, not at query time.
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=rohunvora/x-research-skill&type=Date)](https://star-history.com/#rohunvora/x-research-skill&Date)
+
 ## License
 
 MIT
