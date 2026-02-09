@@ -145,21 +145,39 @@ bun run x-search.ts search "crypto AI" --quality
 
 ## Cost
 
-X API charges per tweet read. Every search page = ~100 reads.
+As of February 2026, the X API uses **pay-per-use pricing** with prepaid credits. No subscriptions, no monthly caps. You buy credits in the [Developer Console](https://console.x.com) and they're deducted per request.
 
-| Operation | API calls | Est. cost |
-|-----------|-----------|-----------|
-| Quick search (1 page) | 1 | ~$0.50 |
-| Standard search (1 page) | 1 | ~$0.50 |
-| Deep research (3 pages) | 3 | ~$1.50 |
-| Watchlist check (5 accounts) | 5 | ~$0.13/ea |
-| Cached repeat | 0 | free |
+**Per-resource costs:**
+| Resource | Cost |
+|----------|------|
+| Post read | $0.005 |
+| User lookup | $0.010 |
+| Post create | $0.010 |
+
+**Search cost:** Each search page returns up to 100 posts = ~$0.50/page.
+
+| Operation | Est. cost |
+|-----------|-----------|
+| Quick search (1 page, ≤100 posts) | ~$0.50 |
+| Standard search (1 page) | ~$0.50 |
+| Deep research (3 pages) | ~$1.50 |
+| Profile check (user + posts) | ~$0.51 |
+| Watchlist check (5 accounts) | ~$2.55 |
+| Cached repeat (any) | free |
+
+**24-hour deduplication:** If you request the same post twice in a UTC day, you're only charged once. This means repeat searches on the same topic within a day cost less than the estimate above.
+
+**Spending controls:** Set auto-recharge thresholds and spending limits per billing cycle in the Developer Console. Failed requests are never billed.
+
+**xAI credit bonus:** Spend $200+/cycle on X API → earn 10-20% back as xAI/Grok API credits. See [pricing docs](https://docs.x.com/x-api/getting-started/pricing).
 
 **How x-search saves money:**
 - Cache (15min default, 1hr in quick mode) — repeat queries are free
+- 24-hour dedup means re-running the same search costs $0 at API level too
 - Quick mode prevents accidental multi-page fetches
 - Cost displayed after every search so you know what you're spending
 - `--from` targets specific users instead of broad searches
+- Monitor your usage programmatically: `GET /2/usage/tweets`
 
 ## File structure
 
@@ -178,10 +196,11 @@ x-research/
 
 ## Limitations
 
-- Search covers last 7 days only (X API restriction on Basic tier)
+- Search covers last 7 days only (recent search endpoint restriction)
 - Read-only — never posts or interacts
-- Requires X API Basic tier ($200/mo) or higher
-- `min_likes` / `min_retweets` operators unavailable on Basic tier (filtered post-hoc instead)
+- Requires X API access with prepaid credits ([sign up](https://console.x.com))
+- `min_likes` / `min_retweets` search operators unavailable (filtered post-hoc instead)
+- Full-archive search (beyond 7 days) requires enterprise access
 
 ## Star History
 

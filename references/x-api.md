@@ -103,6 +103,51 @@ External URLs from tweets are in `entities.urls[].expanded_url`. Use WebFetch to
 - 450 requests per 15-minute window (app-level)
 - 300 requests per 15-minute window (user-level)
 
+### Cost (Pay-Per-Use — Updated Feb 2026)
+
+X API uses **pay-per-use pricing** with prepaid credits. No subscriptions, no monthly caps.
+
+**Per-resource costs:**
+| Resource | Cost |
+|----------|------|
+| Post read | $0.005 |
+| User lookup | $0.010 |
+| Post create | $0.010 |
+
+A typical research session: 5 queries × 100 tweets = 500 post reads = ~$2.50.
+
+**24-hour deduplication:** Same post requested multiple times within a UTC day = 1 charge. Re-running the same search within 24h costs significantly less.
+
+**Billing details:**
+- Purchase credits upfront at [console.x.com](https://console.x.com)
+- Set auto-recharge (trigger amount + threshold) to avoid interruptions
+- Set spending limits per billing cycle
+- Failed requests are not billed
+- Streaming (Filtered Stream): each unique post delivered counts, with 24h dedup
+
+**Usage monitoring endpoint:**
+```
+GET https://api.x.com/2/usage/tweets
+Authorization: Bearer $BEARER_TOKEN
+```
+Returns daily post consumption counts per app. Use for budget tracking and alerts.
+
+**xAI credit bonus:**
+| Cumulative spend (per cycle) | xAI credit rate |
+|------------------------------|-----------------|
+| $0 – $199 | 0% |
+| $200 – $499 | 10% |
+| $500 – $999 | 15% |
+| $1,000+ | 20% |
+
+Credits are rolling — order/size of purchases doesn't affect total rewards.
+
+**Tracked endpoints (all count toward usage):**
+- Post lookup, Recent search, Full-archive search
+- Filtered stream, Filtered stream webhooks
+- User posts/mentions timelines
+- Liked posts, Bookmarks, List posts, Spaces lookup
+
 ## Single Tweet Lookup
 
 ```

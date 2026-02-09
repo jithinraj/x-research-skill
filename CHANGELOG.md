@@ -1,11 +1,26 @@
 # Changelog
 
+## v2.2.1 (2026-02-09)
+
+### Fixed
+- **Updated all pricing docs to reflect X API's new pay-per-use model** (launched Feb 6, 2026)
+  - Old: Required $200/mo Basic tier subscription — **no longer exists**
+  - New: Prepaid credits, pay only for what you use, no subscriptions, no monthly caps
+- Added per-resource cost breakdown: $0.005/post read, $0.010/user lookup, $0.010/post create
+- Added 24-hour deduplication docs — same post fetched twice in a day = 1 charge
+- Added xAI credit bonus tiers (10-20% back as Grok credits at $200+ spend)
+- Added usage monitoring endpoint (`GET /2/usage/tweets`) for programmatic cost tracking
+- Added Developer Console reference (console.x.com) for credit management, auto-recharge, spending limits
+- Added full list of tracked/billable endpoints
+- Fixed Limitations section — removed outdated "$200/mo" requirement
+- Added full-archive search (enterprise-only) note
+
 ## v2.2.0 (2026-02-08)
 
 ### Added
 - **`--quick` mode** — Smarter, cheaper searches. Single page, auto noise filtering (`-is:retweet -is:reply`), 1hr cache TTL. Designed for fast pulse checks.
 - **`--from <username>`** — Shorthand for `from:username` queries. `search "BNKR" --from voidcider` instead of typing the full operator.
-- **`--quality` flag** — Filters out low-engagement tweets (≥10 likes). Applied post-fetch since `min_faves` isn't available on Basic tier.
+- **`--quality` flag** — Filters out low-engagement tweets (≥10 likes). Applied post-fetch since `min_faves` operator isn't available via the API.
 - **Cost display on all searches** — Every search now shows estimated API cost: `📊 N tweets read · est. cost ~$X`
 
 ### Changed
