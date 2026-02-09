@@ -1,27 +1,16 @@
-# x-research-skill
+# x-research
 
-X/Twitter research skill for [Claude Code](https://code.claude.com) and [OpenClaw](https://openclaw.ai). Agentic search, thread following, deep-dives, sourced briefings.
+X/Twitter research agent for [Claude Code](https://code.claude.com) and [OpenClaw](https://openclaw.ai). Search, filter, monitor — all from the terminal.
 
 ## What it does
 
-Turns Claude into an X/Twitter research agent. Ask questions like "what are people saying about BNKR" or "search X for Opus 4.6 trading" and get sourced briefings with engagement data, thread context, and linked resources.
+Wraps the X API into a fast CLI so your AI agent (or you) can search tweets, pull threads, monitor accounts, and get sourced research without writing curl commands.
 
-## v2: CLI Tooling (New)
-
-v2 adds `x-search.ts` — a Bun CLI that wraps the X API, so Claude doesn't need to assemble raw curl commands. Same research loop, much faster execution.
-
-**What changed:**
-- `x-search.ts` handles search, profiles, threads, single tweet lookups
-- 15-minute result cache (saves API costs on repeated queries)
-- Built-in engagement sorting and filtering (`--sort likes`, `--min-likes 50`)
-- Watchlist for monitoring accounts
-- Auto noise filtering (`-is:retweet` added by default)
-- Clean Telegram + markdown formatters
-
-**What didn't change:**
-- Still uses the same agentic research loop (decompose → search → refine → synthesize)
-- Still read-only (never posts)
-- Still works as a pure prompt skill if you don't want the CLI
+- **Search** with engagement sorting, time filtering, noise removal
+- **Quick mode** for cheap, targeted lookups
+- **Watchlists** for monitoring accounts
+- **Cache** to avoid repeat API charges
+- **Cost transparency** — every search shows what it cost
 
 ## Install
 
@@ -125,12 +114,11 @@ bun run x-search.ts search "BNKR" --from voidcider --quick
 bun run x-search.ts search "AI agents" --quality --quick
 ```
 
-**Cost comparison:**
-| Mode | Pages | Max tweets | Est. cost |
-|------|-------|-----------|-----------|
-| `--quick` | 1 | 10 | ~$0.50 |
-| Default (1 page) | 1 | 100 | ~$0.50 |
-| Multi-page (3) | 3 | 300 | ~$1.50 |
+**Why it's cheaper:**
+- Prevents multi-page fetches (biggest cost saver)
+- 1hr cache means repeat searches are free
+- Noise filters mean fewer junk results in your 100-tweet page
+- You see cost after every search — no surprises
 
 ## `--from` Shorthand
 
@@ -149,7 +137,7 @@ If your query already contains `from:`, the flag won't double-add it.
 
 ## `--quality` Flag
 
-Filters out low-engagement tweets (requires ≥10 likes). Since `min_faves` is unavailable on X API Basic tier, this is applied post-hoc after fetching. Useful for high-noise topics where you only want tweets with some traction.
+Filters out low-engagement tweets (≥10 likes required). Applied post-fetch since `min_faves` isn't available on X API Basic tier.
 
 ```bash
 bun run x-search.ts search "crypto AI" --quality
@@ -157,42 +145,36 @@ bun run x-search.ts search "crypto AI" --quality
 
 ## Cost
 
-X API charges ~$0.005 per tweet read. Every search result counts as a read.
+X API charges per tweet read. Every search page = ~100 reads.
 
-**How x-search minimizes cost:**
-- **Caching**: Identical queries are cached (15min default, 1hr in quick mode). Repeated searches hit cache instead of the API.
-- **Quick mode**: Single page + noise filters = fewer junk reads
-- **Quality filter**: `min_faves:10` pre-filters before counting against quota
-- **Cost display**: Every search shows estimated cost so you always know what you're spending
+| Operation | API calls | Est. cost |
+|-----------|-----------|-----------|
+| Quick search (1 page) | 1 | ~$0.50 |
+| Standard search (1 page) | 1 | ~$0.50 |
+| Deep research (3 pages) | 3 | ~$1.50 |
+| Watchlist check (5 accounts) | 5 | ~$0.13/ea |
+| Cached repeat | 0 | free |
 
-**Typical costs:**
-| Operation | Tweets | Est. cost |
-|-----------|--------|-----------|
-| Quick search | ~10-100 | ~$0.05-$0.50 |
-| Standard search (1 page) | ~100 | ~$0.50 |
-| Deep research (5 queries × 2 pages) | ~1000 | ~$5.00 |
-| Watchlist check (5 accounts) | ~25 | ~$0.13 |
+**How x-search saves money:**
+- Cache (15min default, 1hr in quick mode) — repeat queries are free
+- Quick mode prevents accidental multi-page fetches
+- Cost displayed after every search so you know what you're spending
+- `--from` targets specific users instead of broad searches
 
 ## File structure
 
 ```
 x-research/
-├── SKILL.md              # Skill instructions (Claude reads this)
+├── SKILL.md              # Agent instructions (Claude reads this)
 ├── x-search.ts           # CLI entry point
 ├── lib/
 │   ├── api.ts            # X API wrapper
-│   ├── cache.ts          # File-based cache (15min TTL)
+│   ├── cache.ts          # File-based cache
 │   └── format.ts         # Telegram + markdown formatters
-├── data/
-│   ├── watchlist.json    # Accounts to monitor (create your own)
-│   └── cache/            # Auto-managed
-└── references/
-    └── x-api.md          # X API endpoint reference
+└── data/
+    ├── watchlist.json    # Accounts to monitor
+    └── cache/            # Auto-managed
 ```
-
-## API costs
-
-X API charges ~$0.005/tweet read. A typical research session (5 queries × 100 tweets) ≈ $2.50. The cache avoids repeat charges for identical queries within 15 minutes.
 
 ## Limitations
 
